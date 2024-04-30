@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "epic_events"
+version = "0.1.0"
+description = ""
+authors = ["lethyxnekuia <maxguillemot@hotmail.fr>"]
+readme = "README.md"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pytest = "^6.2.5"
+click = "^7.1"
+sqlalchemy = "^1.4"
+passlib = "^1.7.4"
+itsdangerous = "^2.0.0"
+validate_email_address = "*"
+python-dotenv = "*"
+coverage = "*"
+sentry-sdk = "*"
+black = "*"
