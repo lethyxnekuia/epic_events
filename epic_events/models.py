@@ -61,7 +61,7 @@ class Event(Base):
     contract_id = Column(Integer, ForeignKey("contracts.id"))
     support_contact_id = Column(
         Integer, ForeignKey("users.id")
-    )  # Ajout de la clé étrangère
+    )
     start_date = Column(DateTime)
     end_date = Column(DateTime)
     location = Column(String)

@@ -2,7 +2,7 @@ import click
 from datetime import datetime
 from ..database import sessionLocal, init_db
 from epic_events.events.events_commands import events
-from ..models import User, DepartmentEnum, Client, Contract, Event
+from ..models import User, DepartmentEnum, Event
 
 init_db()
 
@@ -14,9 +14,7 @@ def get_user_department(user_id):
     return user.department if user else None
 
 
-events.group()
-
-
+@events.group()
 @click.pass_context
 def support(ctx):
     user_id = ctx.obj.get("user_id")
@@ -72,7 +70,7 @@ def update_event(ctx):
 
 @support.command()
 @click.pass_context
-def list_events_without_support(ctx):
+def list_user_events(ctx):
     """Liste des événements attribués"""
     events = session.query(Event).filter(
         Event.support_contact_id == ctx.obj.get("user_id")

@@ -146,6 +146,7 @@ def update_contract():
 
 @gestion.command()
 def add_user_to_event():
+    """Ajouter un utilisateur support à un événement"""
     event_id = click.prompt("ID événement")
     event = session.query(Event).filter_by(id=event_id).first()
     if not event:
@@ -172,7 +173,7 @@ def add_user_to_event():
 @gestion.command()
 def list_events_without_support():
     """Liste des événements sans support"""
-    events = session.query(Event).filter(Event.support_contact_id == None)
+    events = session.query(Event).filter(Event.support_contact_id is None)
     for event in events:
         click.echo(
             f"ID: {event.id}, Nom: {event.name}, Date de début: {event.start_date}, Lieu: {event.location}"

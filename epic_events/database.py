@@ -3,12 +3,14 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
-DATABASE_URL = "sqlite:///./test.db"
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 engine = create_engine(DATABASE_URL)
 
 
-def sessionLocal(is_test=False):
+def sessionLocal(engine_test=None):
+    if engine_test:
+        scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine_test))
     return scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 

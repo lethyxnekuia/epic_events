@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch
 from ..events.commercial_commands import (
     create_client,
@@ -7,9 +8,12 @@ from ..events.commercial_commands import (
 )
 from click.testing import CliRunner
 import pytest
-from ..database import Base, sessionLocal, engine
+from ..database import Base, sessionLocal
 from ..models import User, Contract
+from sqlalchemy import create_engine
 
+DATABASE_URL = os.environ.get("DATABASE_URL_TEST")
+engine = create_engine(DATABASE_URL)
 
 def init_db():
     Base.metadata.create_all(bind=engine)
@@ -19,7 +23,7 @@ def init_db():
 def db_test():
     try:
         init_db()
-        SessionLocal = sessionLocal(True)
+        SessionLocal = sessionLocal(engine)
         yield SessionLocal
     finally:
         SessionLocal().close()
@@ -28,7 +32,7 @@ def db_test():
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_create_client(mock_prompt, db_test):
+def test_create_client(mock_prompt):
     mock_prompt.side_effect = ["Jean test", "jeantest@test.com", "0345151515", "Test"]
     ctx_mock = {"user_id": 1}
     runner = CliRunner()
@@ -38,7 +42,7 @@ def test_create_client(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_update_client(mock_prompt, db_test):
+def test_update_client(mock_prompt):
     mock_prompt.side_effect = [
         "1",
         "Jean test 2",
@@ -136,7 +140,7 @@ def test_fail_create_event(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_update_contract(mock_prompt, db_test):
+def test_update_contract(mock_prompt):
     mock_prompt.side_effect = ["1", "600", "300", True]
     ctx_mock = {"user_id": 1}
     runner = CliRunner()
@@ -148,7 +152,7 @@ def test_update_contract(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_fail_update_contract(mock_prompt, db_test):
+def test_fail_update_contract(mock_prompt):
     mock_prompt.side_effect = ["3", "600", "300", True]
     ctx_mock = {"user_id": 1}
     runner = CliRunner()

@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch
 from unittest.mock import MagicMock
 from ..events.gestion_commands import (
@@ -10,8 +11,11 @@ from ..events.gestion_commands import (
 )
 from click.testing import CliRunner
 import pytest
-from ..database import Base, sessionLocal, engine
+from ..database import Base, sessionLocal
+from sqlalchemy import create_engine
 
+DATABASE_URL = os.environ.get("DATABASE_URL_TEST")
+engine = create_engine(DATABASE_URL)
 
 def init_db():
     Base.metadata.create_all(bind=engine)
@@ -21,7 +25,7 @@ def init_db():
 def db_test():
     try:
         init_db()
-        SessionLocal = sessionLocal(True)
+        SessionLocal = sessionLocal(engine)
         yield SessionLocal
     finally:
         SessionLocal().close()
@@ -30,7 +34,7 @@ def db_test():
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_create_user(mock_prompt, db_test):
+def test_create_user(mock_prompt):
     mock_prompt.side_effect = ["test@mail.com", "mdptest", "support"]
     runner = CliRunner()
     result = runner.invoke(create_user)
@@ -42,7 +46,7 @@ def test_create_user(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_update_user(mock_prompt, db_test):
+def test_update_user(mock_prompt):
     mock_prompt.side_effect = ["2", "test2@mail.com", "mdptest", "support"]
     runner = CliRunner()
     result = runner.invoke(update_user)
@@ -54,7 +58,7 @@ def test_update_user(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_fail_update_user(mock_prompt, db_test):
+def test_fail_update_user(mock_prompt):
     mock_prompt.side_effect = ["5", "test2@mail.com", "mdptest", "support"]
     runner = CliRunner()
     result = runner.invoke(update_user)
@@ -64,7 +68,7 @@ def test_fail_update_user(mock_prompt, db_test):
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
 @patch("click.confirm", return_value=True)
-def test_delete_user(mock_confirm, mock_prompt, db_test):
+def test_delete_user(mock_confirm, mock_prompt):
     mock_prompt.side_effect = ["2"]
     runner = CliRunner()
     result = runner.invoke(delete_user)
@@ -73,7 +77,7 @@ def test_delete_user(mock_confirm, mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_create_contract(mock_prompt, db_test):
+def test_create_contract(mock_prompt):
     mock_prompt.side_effect = ["1", "500", "250", False]
     runner = CliRunner()
     result = runner.invoke(create_contract)
@@ -82,7 +86,7 @@ def test_create_contract(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_fail_create_contract(mock_prompt, db_test):
+def test_fail_create_contract(mock_prompt):
     mock_prompt.side_effect = ["4", "500", "250", False]
     runner = CliRunner()
     result = runner.invoke(create_contract)
@@ -91,7 +95,7 @@ def test_fail_create_contract(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_update_contract(mock_prompt, db_test):
+def test_update_contract(mock_prompt):
     mock_prompt.side_effect = ["1", "1", "500", "250", False]
     runner = CliRunner()
     result = runner.invoke(update_contract)
@@ -102,7 +106,7 @@ def test_update_contract(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_add_user_to_event(mock_prompt, db_test):
+def test_add_user_to_event(mock_prompt):
     mock_prompt.side_effect = ["1", "1"]
     runner = CliRunner()
     result = runner.invoke(add_user_to_event)
@@ -114,7 +118,7 @@ def test_add_user_to_event(mock_prompt, db_test):
 
 @pytest.mark.usefixtures("db_test")
 @patch("click.prompt")
-def test_fail_add_user_to_event(mock_prompt, db_test):
+def test_fail_add_user_to_event(mock_prompt):
     mock_prompt.side_effect = ["3", "1"]
     runner = CliRunner()
     result = runner.invoke(add_user_to_event)
