@@ -31,6 +31,7 @@ def read_token_from_file():
 def events(ctx):
     token = read_token_from_file()
     if not token:
+        click.echo("Vous n'êtes pas connecté.")
         raise click.Abort()
     user_id = verify_token(token)
     if user_id is None:
@@ -75,3 +76,4 @@ def list_events():
         click.echo(
             f"ID: {event.id}, Nom: {event.name}, Date de début: {event.start_date}, Lieu: {event.location}"
         )
+
