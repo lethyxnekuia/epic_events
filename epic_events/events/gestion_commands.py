@@ -3,10 +3,20 @@ from datetime import datetime
 from ..database import sessionLocal, init_db
 from epic_events.events.events_commands import events
 from ..models import User, DepartmentEnum, Client, Contract, Event
+import re
+import bcrypt
+
 
 init_db()
 
 session = sessionLocal()
+
+
+def validate_email(email):
+    email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if not re.match(email_regex, email):
+        return False
+    return True
 
 
 @events.group()
@@ -25,13 +35,18 @@ def gestion(ctx):
 @gestion.command()
 def create_user():
     """Créer un nouvel utilisateur"""
-    email = click.prompt("Email")
+    while True:
+        email = click.prompt("Email")
+        if validate_email(email):
+            break
+        click.echo("Mail Invalide")
     password = click.prompt("Mot de Passe", hide_input=True, confirmation_prompt=True)
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     valid_departments = ["commercial", "support", "gestion"]
     department = click.prompt("Department", type=click.Choice(valid_departments))
 
-    new_user = User(email=email, password=password, department=department)
+    new_user = User(email=email, password=hashed_password, department=department)
     session.add(new_user)
     session.commit()
     click.echo(

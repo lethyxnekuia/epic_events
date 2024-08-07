@@ -3,6 +3,7 @@ from ..database import sessionLocal
 from ..models import User
 from dotenv import load_dotenv
 import os
+import bcrypt
 
 session = sessionLocal()
 
@@ -33,15 +34,16 @@ def users():
 def login():
     """Connexion avec email et mot de passe"""
     email = click.prompt("Email")
-    password = click.prompt("Password", hide_input=True, confirmation_prompt=True)
-    user = session.query(User).filter_by(email=email, password=password).first()
-    if user:
+    password = click.prompt("Password")
+
+    user = session.query(User).filter_by(email=email).first()
+
+    if user and bcrypt.checkpw(password.encode('utf-8'), user.password):
         token = User.generate_token(SECRET_KEY, user.id)
         save_token_to_file(token)
         click.echo(f"Connecté avec succès. Token: {token}")
     else:
         click.echo("Email ou mot de passe incorrect.")
-
 
 @users.command()
 def logout():
