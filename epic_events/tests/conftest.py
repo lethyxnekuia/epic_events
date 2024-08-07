@@ -1,11 +1,13 @@
 import os
+from dotenv import load_dotenv
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from epic_events.database import Base
 
+load_dotenv()
 
-DATABASE_URL = os.environ.get("DATABASE_URL_TEST")
+DATABASE_URL = os.getenv("DATABASE_URL_TEST")
 engine = create_engine(DATABASE_URL)
 
 
