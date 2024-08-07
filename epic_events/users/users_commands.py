@@ -45,6 +45,7 @@ def login():
     else:
         click.echo("Email ou mot de passe incorrect.")
 
+
 @users.command()
 def logout():
     """Déconnexion et suppression du fichier token"""
