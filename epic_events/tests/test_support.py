@@ -9,8 +9,9 @@ import pytest
 from ..database import Base, sessionLocal
 from ..models import User, Contract, Event
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
 
-DATABASE_URL = os.environ.get("DATABASE_URL_TEST")
+DATABASE_URL = "sqlite:///./dbtest.db"
 engine = create_engine(DATABASE_URL)
 
 def init_db():
@@ -19,32 +20,34 @@ def init_db():
 
 @pytest.fixture(scope="session")
 def db_test():
+    init_db()
+    SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+    session = SessionLocal()
     try:
-        init_db()
-        SessionLocal = sessionLocal(engine)
-        yield SessionLocal
+        yield session
     finally:
-        SessionLocal().close()
+        session.close()
         Base.metadata.drop_all(bind=engine)
 
 
 @pytest.mark.usefixtures("db_test")
+@patch("epic_events.events.support_commands.session", autospec=True)
 @patch("click.prompt")
-def test_update_event(mock_prompt, db_test):
-    session = db_test()
-
+def test_update_event(mock_prompt, mock_session, db_test):
     contract = Contract(
         client_id="1", total_amount="500", remaining_amount="200", is_signed=True
     )
-    session.add(contract)
+    db_test.add(contract)
 
     event = Event(
         name="test event",
         contract_id="1",
         support_contact_id="1",
     )
-    session.add(event)
-    session.commit()
+    db_test.add(event)
+    db_test.commit()
+
+    mock_session.query.return_value.filter_by.return_value.first.return_value = event
 
     mock_prompt.side_effect = [
         "1",
@@ -61,22 +64,23 @@ def test_update_event(mock_prompt, db_test):
     assert "L'événement avec l'ID 1 mises à jour avec succès." in result.output
 
 @pytest.mark.usefixtures("db_test")
+@patch("epic_events.events.support_commands.session", autospec=True)
 @patch("click.prompt")
-def test_fail_update_event(mock_prompt, db_test):
-    session = db_test()
-
+def test_fail_update_event(mock_prompt, mock_session, db_test):
     contract = Contract(
         client_id="1", total_amount="500", remaining_amount="200", is_signed=True
     )
-    session.add(contract)
+    db_test.add(contract)
 
     event = Event(
         name="test event",
         contract_id="1",
         support_contact_id="1",
     )
-    session.add(event)
-    session.commit()
+    db_test.add(event)
+    db_test.commit()
+
+    mock_session.query.return_value.filter_by.return_value.first.return_value = None
 
     mock_prompt.side_effect = [
         "23",
@@ -85,6 +89,8 @@ def test_fail_update_event(mock_prompt, db_test):
     runner = CliRunner()
     result = runner.invoke(update_event, obj=ctx_mock)
     assert "L'événement avec l'ID 23 n'existe pas." in result.output
+
+    mock_session.query.return_value.filter_by.return_value.first.return_value = event
 
     mock_prompt.side_effect = [
         "1",

@@ -8,7 +8,9 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 engine = create_engine(DATABASE_URL)
 
 
-def sessionLocal():
+def sessionLocal(engine_test=None):
+    if engine_test:
+        return scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine_test))
     return scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 
