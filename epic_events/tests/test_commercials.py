@@ -1,4 +1,3 @@
-import os
 from unittest.mock import patch
 from ..events.commercial_commands import (
     create_client,
@@ -8,33 +7,15 @@ from ..events.commercial_commands import (
 )
 from click.testing import CliRunner
 import pytest
-from ..database import Base, sessionLocal
 from ..models import User, Contract, Client
-from sqlalchemy import create_engine
 from datetime import datetime
-
-DATABASE_URL = os.environ.get("DATABASE_URL_TEST")
-engine = create_engine(DATABASE_URL)
-
-def init_db():
-    Base.metadata.create_all(bind=engine)
-
-
-@pytest.fixture(scope="session")
-def db_test():
-    try:
-        init_db()
-        SessionLocal = sessionLocal(engine)
-        yield SessionLocal
-    finally:
-        SessionLocal().close()
-        Base.metadata.drop_all(bind=engine)
 
 
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.events.commercial_commands.session", autospec=True)
 @patch("click.prompt")
-def test_create_client(mock_prompt, mock_session):
+def test_create_client(mock_prompt, mock_session, db_test):
+    mock_session.return_value = db_test
     mock_prompt.side_effect = ["Jean test", "jeantest@test.com", "0345151515", "Test"]
     ctx_mock = {"user_id": 1}
     runner = CliRunner()
@@ -45,7 +26,8 @@ def test_create_client(mock_prompt, mock_session):
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.events.commercial_commands.session", autospec=True)
 @patch("click.prompt")
-def test_update_client(mock_prompt, mock_session):
+def test_update_client(mock_prompt, mock_session, db_test):
+    mock_session.return_value = db_test
     client = Client(
         full_name="Jean test",
         email="jeantest@test.com",
@@ -73,7 +55,8 @@ def test_update_client(mock_prompt, mock_session):
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.events.commercial_commands.session", autospec=True)
 @patch("click.prompt")
-def test_success_create_event(mock_prompt, mock_session):
+def test_success_create_event(mock_prompt, mock_session, db_test):
+    mock_session.return_value = db_test
     user = User(id=1, email="test1@example.com", password="password", department="support")
 
     contract = Contract(
@@ -109,7 +92,8 @@ def test_success_create_event(mock_prompt, mock_session):
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.events.commercial_commands.session", autospec=True)
 @patch("click.prompt")
-def test_fail_create_event(mock_prompt, mock_session):
+def test_fail_create_event(mock_prompt, mock_session, db_test):
+    mock_session.return_value = db_test
     mock_session.query.return_value.filter_by.return_value.first.return_value = None
     mock_prompt.side_effect = [
         "2",
@@ -182,7 +166,8 @@ def test_fail_create_event(mock_prompt, mock_session):
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.events.commercial_commands.session", autospec=True)
 @patch("click.prompt")
-def test_update_contract(mock_prompt, mock_session):
+def test_update_contract(mock_prompt, mock_session, db_test):
+    mock_session.return_value = db_test
     contract = Contract(
         client_id="1",
         total_amount="500",
@@ -215,7 +200,8 @@ def test_update_contract(mock_prompt, mock_session):
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.events.commercial_commands.session", autospec=True)
 @patch("click.prompt")
-def test_fail_update_contract(mock_prompt, mock_session):
+def test_fail_update_contract(mock_prompt, mock_session, db_test):
+    mock_session.return_value = db_test
     mock_session.query.return_value.filter_by.return_value.first.return_value = None
     mock_prompt.side_effect = ["3", "600", "300", True]
     ctx_mock = {"user_id": 1}
