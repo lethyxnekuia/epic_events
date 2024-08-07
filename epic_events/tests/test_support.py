@@ -11,7 +11,7 @@ from ..models import User, Contract, Event
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-DATABASE_URL = "sqlite:///./dbtest.db"
+DATABASE_URL = os.environ.get("DATABASE_URL_TEST")
 engine = create_engine(DATABASE_URL)
 
 def init_db():

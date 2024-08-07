@@ -13,7 +13,7 @@ from ..models import User, Contract, Client
 from sqlalchemy import create_engine
 from datetime import datetime
 
-DATABASE_URL = "sqlite:///./dbtest.db"
+DATABASE_URL = os.environ.get("DATABASE_URL_TEST")
 engine = create_engine(DATABASE_URL)
 
 def init_db():
