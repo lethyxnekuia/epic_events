@@ -2,13 +2,16 @@ import os
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from epic_events.database import Base, sessionLocal
+from epic_events.database import Base
+
 
 DATABASE_URL = os.environ.get("DATABASE_URL_TEST")
 engine = create_engine(DATABASE_URL)
 
+
 def init_db():
     Base.metadata.create_all(bind=engine)
+
 
 @pytest.fixture(scope="session")
 def db_test():

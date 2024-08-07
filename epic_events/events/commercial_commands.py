@@ -164,7 +164,7 @@ def create_event(ctx):
 @commercial.command()
 def list_contracts_not_signed():
     """Lister des contrats non signés"""
-    contracts = session.query(Contract).filter(Contract.is_signed == False)
+    contracts = session.query(Contract).filter(Contract.is_signed is False)
     for contract in contracts:
         click.echo(
             f"ID: {contract.id}, Client: {contract.client_id}, Montant: {contract.total_amount}"

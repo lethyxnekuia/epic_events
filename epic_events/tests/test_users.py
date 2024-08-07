@@ -25,6 +25,7 @@ def test_login_success(mock_prompt, mock_session, db_test):
 
     assert "Connecté avec succès" in result.output
 
+
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.users.users_commands.session", autospec=True)
 @patch("click.prompt")

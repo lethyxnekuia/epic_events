@@ -142,7 +142,7 @@ def test_fail_create_event(mock_prompt, mock_session, db_test):
         last_contact_date=datetime.now(),
         commercial_contact_id=1
     )
-    mock_session.query.return_value.filter_by.return_value.first.side_effect=[
+    mock_session.query.return_value.filter_by.return_value.first.side_effect = [
         contract,
         client,
         None
@@ -183,7 +183,7 @@ def test_update_contract(mock_prompt, mock_session, db_test):
         last_contact_date=datetime.now(),
         commercial_contact_id=1
     )
-    mock_session.query.return_value.filter_by.return_value.first.side_effect=[
+    mock_session.query.return_value.filter_by.return_value.first.side_effect = [
         contract,
         client,
         None

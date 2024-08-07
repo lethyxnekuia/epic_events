@@ -12,7 +12,6 @@ import pytest
 from ..models import User, Event, Contract
 
 
-
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.events.gestion_commands.session", autospec=True)
 @patch("click.prompt")
@@ -75,7 +74,6 @@ def test_delete_user(mock_confirm, mock_prompt, mock_session, db_test):
 
 
 @pytest.mark.usefixtures("db_test")
-
 @patch("epic_events.events.gestion_commands.session", autospec=True)
 @patch("click.prompt")
 def test_create_contract(mock_prompt, mock_session, db_test):

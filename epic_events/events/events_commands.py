@@ -76,4 +76,3 @@ def list_events():
         click.echo(
             f"ID: {event.id}, Nom: {event.name}, Date de début: {event.start_date}, Lieu: {event.location}"
         )
-

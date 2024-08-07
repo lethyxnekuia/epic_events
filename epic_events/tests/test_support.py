@@ -1,12 +1,10 @@
 from unittest.mock import patch
-from unittest.mock import MagicMock
 from ..events.support_commands import (
     update_event,
 )
 from click.testing import CliRunner
 import pytest
 from ..models import Contract, Event
-
 
 
 @pytest.mark.usefixtures("db_test")
@@ -42,6 +40,7 @@ def test_update_event(mock_prompt, mock_session, db_test):
     runner = CliRunner()
     result = runner.invoke(update_event, obj=ctx_mock)
     assert "L'événement avec l'ID 1 mises à jour avec succès." in result.output
+
 
 @pytest.mark.usefixtures("db_test")
 @patch("epic_events.events.support_commands.session", autospec=True)
