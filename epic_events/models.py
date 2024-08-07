@@ -108,3 +108,8 @@ class User(Base):
             return data.get("user_id")
         except (BadSignature, SignatureExpired):
             return None
+
+    @staticmethod
+    def get_user_department(session, user_id):
+        user = session.query(User).filter_by(id=user_id).first()
+        return user.department.value if user else None

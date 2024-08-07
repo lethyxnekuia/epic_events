@@ -9,16 +9,11 @@ init_db()
 session = sessionLocal()
 
 
-def get_user_department(user_id):
-    user = session.query(User).filter_by(id=user_id).first()
-    return user.department if user else None
-
-
 @events.group()
 @click.pass_context
 def support(ctx):
     user_id = ctx.obj.get("user_id")
-    department = get_user_department(user_id)
+    department = User.get_user_department(session, user_id)
     if department != DepartmentEnum.support.value:
         click.echo('Accès refusé. Le département doit être "support".')
         raise click.Abort()
